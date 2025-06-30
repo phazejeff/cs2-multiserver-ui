@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wingman Weekend Dashboard</title>
+</head>
+<body>
+  <h1>SERVERS</h1>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for message in messages %}
+        <h3 style="color:lightgreen">{{ message }}</h3>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  {% for server in servers %}
+    <h2>Server {{ server }}</h2>
+    <select class="map-select" data-server="{{ server }}">
+      <option disabled selected value> -- Select a map to start server with --</option>
+      {% for map in maps %}
+        <option value="{{ map }}">{{ map }}</option>
+      {% endfor %}
+    </select>
+
+    <a class="start-button" data-server="{{ server }}" href="/start/{{ server }}">
+      <button>Start</button>
+    </a>
+    <a href="/stop/{{ server }}"><button>Stop</button></a>
+    <a href="/restart/{{ server }}"><button>Restart</button></a>
+  {% endfor %}
+
+  <script>
+    document.querySelectorAll('.map-select').forEach(select => {
+      select.addEventListener('change', () => {
+        const server = select.dataset.server;
+        const selectedMap = select.value;
+        const startButton = document.querySelector(`.start-button[data-server="${server}"]`);
+        startButton.href = `/start/${server}?map=${encodeURIComponent(selectedMap)}`;
+      });
+    });
+  </script>
+</body>
+</html>
