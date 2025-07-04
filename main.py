@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, request, url_for, flash
+from flask import Flask, render_template, redirect, request, url_for, flash, jsonify
 import subprocess
 import asyncio
 import time
@@ -64,7 +64,8 @@ def get_match(match: str):
     if match in matches:
         with open(f"matches/{match}") as f:
             data = f.read()
-            return data
+            data = json.loads(data)
+            return jsonify(data)
     return {}
 
 
@@ -92,6 +93,8 @@ def create_match():
         Map 2: team1 is T, team2 is CT
         Map 3: knife determines
     '''
+    with open("teams.txt") as f:
+        teams = eval(f.read())
     team1 = request.args.get("team1")
     team2 = request.args.get("team2")
     bo = int(request.args.get("bo"))
@@ -104,11 +107,11 @@ def create_match():
         "matchid" : match_id,
         "team1" : {
             "name" : team1,
-            "players" : TEAMS[team1]
+            "players" : teams[team1]
         },
         "team2" : {
             "name" : team2,
-            "players" : TEAMS[team2]
+            "players" : teams[team2]
         },
         "num_maps" : bo
     }
