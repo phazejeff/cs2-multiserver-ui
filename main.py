@@ -74,7 +74,9 @@ def load_match(server: str):
     match = request.args.get("match")
     matches = os.listdir("matches")
     if server in SERVERS and match in matches:
-        subprocess.call(["cs2-server", f"@{server}", "exec", "matchzy_loadmatch_url", f'"http://localhost:{PORT}/getmatch/{match}"'])
+        cmd = f'cs2-server @{server} exec matchzy_loadmatch_url "http://localhost:{PORT}/getmatch/{match}"'
+        print(cmd)
+        os.system(cmd)
         flash(f"Loaded match {match} on server {server}")
     return redirect(url_for("index"))
 
@@ -120,7 +122,7 @@ def create_match():
         match_data["map_list"] = [map1]
         match_data["map_sides"] = ["team1_ct"]
     elif bo == 3:
-        match_data["map_list"] = [map1, map2, map3]
+        match_data["maplist"] = [map1, map2, map3]
         match_data["map_sides"] = ["team1_ct", "team2_ct", "knife"]
     
     match_name = f"{team1}_{team2}_bo{bo}_{match_id}.json"
