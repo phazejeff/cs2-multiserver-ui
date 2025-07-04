@@ -117,7 +117,7 @@ def create_match():
     }
 
     if bo == 1:
-        match_data["map_list"] = [map1]
+        match_data["maplist"] = [map1]
         match_data["map_sides"] = ["team1_ct"]
     elif bo == 3:
         match_data["maplist"] = [map1, map2, map3]
