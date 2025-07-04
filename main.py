@@ -1,9 +1,16 @@
 from flask import Flask, render_template, redirect, request, url_for, flash
 import subprocess
 import asyncio
+import time
+import json
+import os
+import shutil
 
 app = Flask(__name__)
 app.secret_key = 'suck my fat hairy sweaty balls, por favor'
+
+PORT = 5000
+SERVER_FILE_PATH = "E:\Desktop"
 
 MAPS = {
     "de_foroglio" : "3132854332",
@@ -22,9 +29,13 @@ SERVERS = [
     "game4"
 ]
 
+with open("teams.txt") as f:
+    TEAMS: dict[str, dict[str, str]] = eval(f.read())
+
 @app.route("/")
 def index():
-    return render_template("index.html", maps=MAPS.keys(), servers=SERVERS)
+    matches = os.listdir("matches")
+    return render_template("index.html", maps=MAPS.keys(), servers=SERVERS, matches=matches)
 
 @app.route("/start/<server>")
 def start(server: str):
@@ -52,9 +63,77 @@ def restart(server: str):
         flash(f"Restarted server {server}")
     return redirect(url_for("index"))
 
+@app.route("/getmatch/<match>")
+def get_match(match: str):
+    matches = os.listdir("matches")
+    if match in matches:
+        with open(f"matches/{match}"):
+            data = f.read()
+            return data
+    return {}
+
+
+@app.route("/load/<server>/<match>")
+def load_match(server: str, match: str):
+    matches = os.listdir("matches")
+    if server in SERVERS and match in matches:
+        subprocess.call(["echo", "cs2-server", f"@{server}", "exec", "matchzy_loadmatch_url", f"http://127.0.0.1:{PORT}/getmatch/{match}"])
+        flash(f"Loaded match {match} on server {server}")
+    return redirect(url_for("index"))
+
+@app.route("/matches")
+def matches():
+    return render_template("match_setup.html", maps=MAPS.keys(), servers=SERVERS, teams=TEAMS)
+
+@app.route("/creatematch")
+def create_match():
+    '''
+    For bo1, team1 is CT and team2 is T
+    For bo3:
+        Map 1: team1 is CT, team2 is T
+        Map 2: team1 is T, team2 is CT
+        Map 3: knife determines
+    '''
+    team1 = request.args.get("team1")
+    team2 = request.args.get("team2")
+    bo = int(request.args.get("bo"))
+    map1 = request.args.get("map1")
+    map2 = request.args.get("map2")
+    map3 = request.args.get("map3")
+    match_id = round(time.time() * 1000)
+
+    match_data = {
+        "matchid" : match_id,
+        "team1" : {
+            "name" : team1,
+            "players" : TEAMS[team1]
+        },
+        "team2" : {
+            "name" : team2,
+            "players" : TEAMS[team2]
+        },
+        "num_maps" : bo
+    }
+
+    if bo == 1:
+        match_data["map_list"] = [map1]
+        match_data["map_sides"] = ["team1_ct"]
+    elif bo == 3:
+        match_data["map_list"] = [map1, map2, map3]
+        match_data["map_sides"] = ["team1_ct", "team2_ct", "knife"]
+    
+    match_name = f"{team1}_{team2}_bo{bo}_{match_id}.json"
+    with open(f"matches/{match_name}", "w+") as f:
+        match_data_json = json.dumps(match_data)
+        f.write(match_data_json)
+    
+    flash(f"Created match {match_name}")
+    return redirect(url_for("index"))
+
+
 async def changemap(server:str, map: str):
     await asyncio.sleep(2)
     subprocess.call(["cs2-server", f"@{server}", "exec", "host_workshop_map", f"{MAPS[map]}"])
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0")
+    app.run(host="0.0.0.0", port=PORT)

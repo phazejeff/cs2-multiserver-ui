@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wingman Weekend</title>
+</head>
+<body>
+    <h1>Create Match</h1>
+    <form action="/creatematch">
+        <label for="team1">Team 1: </label>
+        <select name="team1" id="team1" onchange="updatePlayers('team1')" required>
+            <option disabled selected value>-- Select Team 1 --</option>
+            {% for team in teams %}
+            <option value="{{ team }}">{{ team }}</option>
+            {% endfor %}
+        </select>
+        <div id="team1-players"></div>
+        <br>
+
+        <label for="team2">Team 2: </label>
+        <select name="team2" id="team2" onchange="updatePlayers('team2')" required>
+            <option disabled selected value>-- Select Team 2 --</option>
+            {% for team in teams %}
+            <option value="{{ team }}">{{ team }}</option>
+            {% endfor %}
+        </select>
+        <div id="team2-players"></div>
+        <br>
+        <label for="bo">Best of: </label><br>
+        <input type="radio" id="bo1" name="bo" value="1" required>
+        <label for="bo1">1 </label>
+        <input type="radio" id="bo3" name="bo" value="3">
+        <label for="bo3">3 </label><br>
+        <label for="map1">Map 1: </label>
+        <select name="map1" id="map1" required>
+            <option disabled selected value>-- Select Map 1 --</option>
+            {% for map in maps %}
+            <option value="{{ map }}">{{ map }}</option>
+            {% endfor %}
+        </select><br>
+        <label for="map2">Map 2: </label>
+        <select name="map2" id="map2">
+            <option disabled selected value>-- Select Map 2 --</option>
+            {% for map in maps %}
+            <option value="{{ map }}">{{ map }}</option>
+            {% endfor %}
+        </select><br>
+        <label for="map3">Map 3: </label>
+        <select name="map3" id="map3">
+            <option disabled selected value>-- Select Map 3 --</option>
+            {% for map in maps %}
+            <option value="{{ map }}">{{ map }}</option>
+            {% endfor %}
+        </select>
+        <br><br>
+        <input type="submit" value="Create">
+    </form>
+</body>
+</html>
+
+<script>
+    const teams = {{ teams | tojson }};
+
+    function updatePlayers(teamId) {
+        const select = document.getElementById(teamId);
+        const selectedTeam = select.value;
+        const playersDiv = document.getElementById(`${teamId}-players`);
+        playersDiv.innerHTML = "";
+
+        if (teams[selectedTeam]) {
+            const list = document.createElement("ul");
+            for (const [steamId, name] of Object.entries(teams[selectedTeam])) {
+                const li = document.createElement("li");
+                li.textContent = name;
+                list.appendChild(li);
+            }
+            playersDiv.appendChild(list);
+        }
+    }
+</script>

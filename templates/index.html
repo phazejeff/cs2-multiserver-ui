@@ -6,6 +6,7 @@
   <title>Wingman Weekend Dashboard</title>
 </head>
 <body>
+  <a href="/matches"><button>Create Match</button></a>
   <h1>SERVERS</h1>
 
   {% with messages = get_flashed_messages() %}
@@ -26,8 +27,7 @@
     </select>
 
     <a class="start-button" data-server="{{ server }}" href="/start/{{ server }}">
-      <button>Start</button>
-    </a>
+      <button>Start</button></a>
     <a href="/stop/{{ server }}"><button>Stop</button></a>
     <a href="/restart/{{ server }}"><button>Restart</button></a>
   {% endfor %}
