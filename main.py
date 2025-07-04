@@ -101,7 +101,8 @@ def create_match():
     map1 = request.args.get("map1")
     map2 = request.args.get("map2")
     map3 = request.args.get("map3")
-    match_id = round(time.time() * 1000)
+    match_id = round(time.time() * 10000)
+    match_id = int(str(match_id)[5:])
 
     match_data = {
         "matchid" : match_id,
