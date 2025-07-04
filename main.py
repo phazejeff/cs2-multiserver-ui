@@ -118,10 +118,10 @@ def create_match():
     }
 
     if bo == 1:
-        match_data["maplist"] = [map1]
+        match_data["maplist"] = [MAPS[map1]]
         match_data["map_sides"] = ["team1_ct"]
     elif bo == 3:
-        match_data["maplist"] = [map1, map2, map3]
+        match_data["maplist"] = [MAPS[map1], MAPS[map2], MAPS[map3]]
         match_data["map_sides"] = ["team1_ct", "team2_ct", "knife"]
     
     match_name = f"{team1}_{team2}_bo{bo}_{match_id}.json"
