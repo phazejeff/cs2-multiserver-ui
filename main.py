@@ -74,9 +74,7 @@ def load_match(server: str):
     match = request.args.get("match")
     matches = os.listdir("matches")
     if server in SERVERS and match in matches:
-        cmd = f'cs2-server @{server} exec matchzy_loadmatch_url "http://localhost:{PORT}/getmatch/{match}"'
-        print(cmd)
-        os.system(cmd)
+        subprocess.call(["cs2-server", f"@{server}", "exec", "matchzy_loadmatch_url", f'\\"http://localhost:{PORT}/getmatch/{match}\\"'])
         flash(f"Loaded match {match} on server {server}")
     return redirect(url_for("index"))
 
