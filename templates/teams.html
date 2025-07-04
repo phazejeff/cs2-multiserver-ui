@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wingman Weekend</title>
+</head>
+<body>
+  <a href="/"><button>Back</button></a>
+  <h1>Edit Teams</h1>
+
+  <label for="teamSelect">Select Team:</label>
+  <select id="teamSelect">
+    <option disabled selected value>-- Select Team --</option>
+    {% for team_name in teams.keys() %}
+    <option value="{{ team_name }}">{{ team_name }}</option>
+    {% endfor %}
+  </select>
+
+  <button id="addTeamBtn" style="margin-left: 10px;">➕ Add New Team</button>
+
+  <div id="playerEditor" style="margin-top: 20px;"></div>
+  <div id="addTeamFormContainer" style="margin-top: 20px;"></div>
+
+  <script>
+    const teams = {{ teams | tojson }};
+    const teamSelect = document.getElementById("teamSelect");
+    const playerEditor = document.getElementById("playerEditor");
+    const addTeamBtn = document.getElementById("addTeamBtn");
+    const addTeamFormContainer = document.getElementById("addTeamFormContainer");
+
+    teamSelect.addEventListener("change", () => {
+      const selectedTeam = teamSelect.value;
+      const players = teams[selectedTeam];
+
+      playerEditor.innerHTML = "";
+      addTeamFormContainer.innerHTML = "";
+
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = `/update_team/${selectedTeam}`;
+
+      Object.entries(players).forEach(([steamID, name], idx) => {
+        const container = document.createElement("div");
+        container.style.marginBottom = "10px";
+
+        container.innerHTML = `
+          <label>Player ${idx + 1} Name: 
+            <input type="text" name="name${idx + 1}" value="${name}">
+          </label>
+          <label> | Steam ID: 
+            <input type="text" name="id${idx + 1}" value="${steamID}">
+          </label>
+        `;
+
+        form.appendChild(container);
+      });
+
+      const submitButton = document.createElement("button");
+      submitButton.type = "submit";
+      submitButton.textContent = "Save Changes";
+      form.appendChild(submitButton);
+
+      playerEditor.appendChild(form);
+    });
+
+    addTeamBtn.addEventListener("click", () => {
+      teamSelect.selectedIndex = 0;
+      playerEditor.innerHTML = "";
+      addTeamFormContainer.innerHTML = "";
+
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = "/add_team";
+
+      form.innerHTML = `
+        <label>New Team Name:
+          <input type="text" name="team_name" required>
+        </label><br><br>
+        <label>Player 1 Name:
+          <input type="text" name="name1" required>
+        </label>
+        <label> | Steam ID:
+          <input type="text" name="id1" required>
+        </label><br><br>
+        <label>Player 2 Name:
+          <input type="text" name="name2" required>
+        </label>
+        <label> | Steam ID:
+          <input type="text" name="id2" required>
+        </label><br><br>
+        <button type="submit">Add Team</button>
+      `;
+
+      addTeamFormContainer.appendChild(form);
+    });
+  </script>
+</body>
+</html>

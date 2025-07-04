@@ -7,6 +7,7 @@
 </head>
 <body>
   <a href="/matches"><button>Create Match</button></a>
+  <a href="/teams"><button>Teams</button></a>
   <h1>SERVERS</h1>
 
   {% with messages = get_flashed_messages() %}
@@ -19,28 +20,19 @@
 
   {% for server in servers %}
     <h2>Server {{ server }}</h2>
-    <select class="map-select" data-server="{{ server }}">
-      <option disabled selected value> -- Select a map to start server with --</option>
-      {% for map in maps %}
-        <option value="{{ map }}">{{ map }}</option>
-      {% endfor %}
-    </select>
-
-    <a class="start-button" data-server="{{ server }}" href="/start/{{ server }}">
-      <button>Start</button></a>
+    <a href="/start/{{ server }}"><button>Start</button></a>
     <a href="/stop/{{ server }}"><button>Stop</button></a>
     <a href="/restart/{{ server }}"><button>Restart</button></a>
+    <form action="/load/{{ server }}">
+      <select id="match" name="match">
+        <option disabled selected value>-- Select Match --</option>
+        {% for match in matches %}
+          <option value="{{ match }}">{{ match }}</option>
+        {% endfor %}
+      </select>
+      <input type="submit" value="Load Match">
+    </form>
   {% endfor %}
 
-  <script>
-    document.querySelectorAll('.map-select').forEach(select => {
-      select.addEventListener('change', () => {
-        const server = select.dataset.server;
-        const selectedMap = select.value;
-        const startButton = document.querySelector(`.start-button[data-server="${server}"]`);
-        startButton.href = `/start/${server}?map=${encodeURIComponent(selectedMap)}`;
-      });
-    });
-  </script>
 </body>
 </html>

@@ -4,13 +4,11 @@ import asyncio
 import time
 import json
 import os
-import shutil
 
 app = Flask(__name__)
 app.secret_key = 'suck my fat hairy sweaty balls, por favor'
 
 PORT = 5000
-SERVER_FILE_PATH = "E:\Desktop"
 
 MAPS = {
     "de_foroglio" : "3132854332",
@@ -28,9 +26,6 @@ SERVERS = [
     "game3",
     "game4"
 ]
-
-with open("teams.txt") as f:
-    TEAMS: dict[str, dict[str, str]] = eval(f.read())
 
 @app.route("/")
 def index():
@@ -67,14 +62,15 @@ def restart(server: str):
 def get_match(match: str):
     matches = os.listdir("matches")
     if match in matches:
-        with open(f"matches/{match}"):
+        with open(f"matches/{match}") as f:
             data = f.read()
             return data
     return {}
 
 
-@app.route("/load/<server>/<match>")
-def load_match(server: str, match: str):
+@app.route("/load/<server>")
+def load_match(server: str):
+    match = request.args.get("match")
     matches = os.listdir("matches")
     if server in SERVERS and match in matches:
         subprocess.call(["echo", "cs2-server", f"@{server}", "exec", "matchzy_loadmatch_url", f"http://127.0.0.1:{PORT}/getmatch/{match}"])
@@ -83,7 +79,9 @@ def load_match(server: str, match: str):
 
 @app.route("/matches")
 def matches():
-    return render_template("match_setup.html", maps=MAPS.keys(), servers=SERVERS, teams=TEAMS)
+    with open("teams.txt") as f:
+        teams = eval(f.read())
+    return render_template("match_setup.html", maps=MAPS.keys(), servers=SERVERS, teams=teams)
 
 @app.route("/creatematch")
 def create_match():
@@ -124,12 +122,48 @@ def create_match():
     
     match_name = f"{team1}_{team2}_bo{bo}_{match_id}.json"
     with open(f"matches/{match_name}", "w+") as f:
-        match_data_json = json.dumps(match_data)
+        match_data_json = json.dumps(match_data, indent=4)
         f.write(match_data_json)
     
     flash(f"Created match {match_name}")
     return redirect(url_for("index"))
 
+@app.route("/teams")
+def teams():
+    with open("teams.txt") as f:
+        teams = eval(f.read())
+    return render_template("teams.html", teams=teams)
+
+@app.route("/update_team/<team>", methods=["POST"])
+def update_team(team):
+    with open("teams.txt", "r+") as f:
+        teams = eval(f.read())
+        teams[team] = {
+            request.form.get("id1") : request.form.get("name1"),
+            request.form.get("id2") : request.form.get("name2")
+        }
+        f.seek(0)
+        f.truncate()
+        teams = json.dumps(teams, indent=4)
+        f.write(teams)
+        flash(f"Updated {team}")
+    return redirect(url_for("index"))
+
+@app.route("/add_team", methods=["POST"])
+def add_team():
+    with open("teams.txt", "r+") as f:
+        teams = eval(f.read())
+        team = request.form.get("team_name")
+        teams[team] = {
+            request.form.get("id1") : request.form.get("name1"),
+            request.form.get("id2") : request.form.get("name2")
+        }
+        f.seek(0)
+        f.truncate()
+        teams = json.dumps(teams, indent=4)
+        f.write(teams)
+        flash(f"Added {team}")
+    return redirect(url_for("index"))
 
 async def changemap(server:str, map: str):
     await asyncio.sleep(2)

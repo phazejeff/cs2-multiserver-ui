@@ -6,7 +6,18 @@
     <title>Wingman Weekend</title>
 </head>
 <body>
+    <a href="/"><button>Back</button></a>
     <h1>Create Match</h1>
+    <p>
+    For bo1:
+    <ul><li>team1 is CT and team2 is T</li></ul>
+    For bo3:
+    <ul>
+        <li>Map 1: team1 is CT, team2 is T</li>
+        <li>Map 2: team1 is T, team2 is CT</li>
+        <li>Map 3: knife determines</li>
+    </ul>
+    </p>
     <form action="/creatematch">
         <label for="team1">Team 1: </label>
         <select name="team1" id="team1" onchange="updatePlayers('team1')" required>
