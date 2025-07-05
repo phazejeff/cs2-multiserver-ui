@@ -116,7 +116,9 @@ def create_match():
         },
         "num_maps" : bo,
         "skip_veto" : False,
-        "maplist" : list(MAPS.values())
+        "maplist" : list(MAPS.values()),
+        "wingman" : True,
+
     }
 
     # if bo == 1:
