@@ -118,7 +118,8 @@ def create_match():
         "skip_veto" : False,
         "maplist" : list(MAPS.values()),
         "wingman" : True,
-
+        "min_players_to_ready" : 3,
+        "players_per_team" : 2
     }
 
     # if bo == 1:
