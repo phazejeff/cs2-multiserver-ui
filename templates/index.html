@@ -16,8 +16,8 @@
     {% endif %}
   {% endwith %}
 
-  {% for server in servers %}
-    <h2>Server {{ server }}</h2>
+  {% for server, ip in servers.items() %}
+    <h2>Server {{ server }} {{ ip }}</h2>
     <select class="map-select" data-server="{{ server }}">
       <option disabled selected value> -- Select a map to start server with --</option>
       {% for map in maps %}

@@ -15,12 +15,12 @@ MAPS = {
     "de_splat" : "3439120481"
 }
 
-SERVERS = [
-    "game1",
-    "game2",
-    "game3",
-    "game4"
-]
+SERVERS = {
+    "game1" : "48.221.120.18:27015",
+    "game2" : "48.221.120.18:27017",
+    "game3" : "48.221.120.18:27019",
+    "game4" : "48.221.120.18:27021"
+}
 
 @app.route("/")
 def index():
@@ -53,7 +53,7 @@ def restart(server: str):
     return redirect(url_for("index"))
 
 async def changemap(server:str, map: str):
-    await asyncio.sleep(2)
+    await asyncio.sleep(8)
     subprocess.call(["cs2-server", f"@{server}", "exec", "host_workshop_map", f"{MAPS[map]}"])
 
 if __name__ == "__main__":
