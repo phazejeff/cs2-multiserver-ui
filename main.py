@@ -31,7 +31,8 @@ def start(server: str):
     map = request.args.get("map")
     if map and map in MAPS:
         subprocess.call(["cs2-server", f"@{server}", "start"])
-        asyncio.run(changemap(server, map))
+        loop = asyncio.get_event_loop()
+        loop.create_task(changemap(server, map))
         flash(f"Started server {server} with map {map}")
     elif server in SERVERS:
         subprocess.call(["cs2-server", f"@{server}", "start"])
@@ -53,7 +54,7 @@ def restart(server: str):
     return redirect(url_for("index"))
 
 async def changemap(server:str, map: str):
-    await asyncio.sleep(8)
+    await asyncio.sleep(20)
     subprocess.call(["cs2-server", f"@{server}", "exec", "host_workshop_map", f"{MAPS[map]}"])
 
 if __name__ == "__main__":
