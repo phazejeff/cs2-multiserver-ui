@@ -1,6 +1,8 @@
 from flask import Flask, render_template, redirect, request, url_for, flash
 import subprocess
-import asyncio
+import threading
+import subprocess
+import time
 
 app = Flask(__name__)
 app.secret_key = 'suck my fat hairy sweaty balls, por favor'
@@ -31,8 +33,7 @@ def start(server: str):
     map = request.args.get("map")
     if map and map in MAPS:
         subprocess.call(["cs2-server", f"@{server}", "start"])
-        loop = asyncio.get_event_loop()
-        loop.create_task(changemap(server, map))
+        threading.Thread(target=changemap, args=(server, map)).start()
         flash(f"Started server {server} with map {map}")
     elif server in SERVERS:
         subprocess.call(["cs2-server", f"@{server}", "start"])
@@ -54,7 +55,7 @@ def restart(server: str):
     return redirect(url_for("index"))
 
 async def changemap(server:str, map: str):
-    await asyncio.sleep(20)
+    time.sleep(15)
     subprocess.call(["cs2-server", f"@{server}", "exec", "host_workshop_map", f"{MAPS[map]}"])
 
 if __name__ == "__main__":
