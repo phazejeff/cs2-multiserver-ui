@@ -54,7 +54,7 @@ def restart(server: str):
         flash(f"Restarted server {server}")
     return redirect(url_for("index"))
 
-async def changemap(server:str, map: str):
+def changemap(server:str, map: str):
     time.sleep(15)
     subprocess.call(["cs2-server", f"@{server}", "exec", "host_workshop_map", f"{MAPS[map]}"])
 
